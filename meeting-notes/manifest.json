@@ -1,0 +1,7 @@
+{
+  "name": "Meeting Notes",
+  "id": "1008205442719890274",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html"
+}

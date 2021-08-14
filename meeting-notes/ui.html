@@ -1,0 +1,84 @@
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet"> 
+<style>
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter";
+    font-weight: 400;
+    font-size: 13px;
+  }
+  textarea {
+    padding: 16px 20px;
+    width: 100%;
+    height: calc(100vh - 35px) ;
+    border: 0;
+    outline: 0;
+    resize: none;
+    font-size: 13px;
+    line-height: 170%;
+    font-family: "Inter";
+    font-weight: 400;
+  }
+  .toolbar {
+    padding: 0 12px;
+    text-align: right;
+    width: 93vw;
+    height: 35px;;
+    background-image: url("data:image/svg+xml,%3Csvg width='360' height='35' viewBox='0 0 360 35' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0)'%3E%3Crect width='360' height='35' fill='%23ECECEC'/%3E%3Cpath d='M-0.5 0H362V26.5H26L-0.5 0Z' fill='white'/%3E%3Cpath d='M0 0H27L26.5 26.5L13 13.5L0 0Z' fill='%23EDEDED'/%3E%3Cline x1='0.353553' y1='0.646447' x2='26.3536' y2='26.6464' stroke='black'/%3E%3Cline x1='26.5' y1='-2.18557e-08' x2='26.5' y2='27' stroke='black'/%3E%3Cline x1='27' y1='0.5' y2='0.5' stroke='black'/%3E%3Cline x1='361' y1='26.5' x2='26' y2='26.5' stroke='black'/%3E%3Cline x1='360' y1='29.5' x2='-1' y2='29.5' stroke='black'/%3E%3Cline x1='360' y1='32.5' x2='-1' y2='32.5' stroke='black'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0'%3E%3Crect width='360' height='35' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A");
+  }
+  .toolbar a {
+    text-decoration: underline;
+    color: #555;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 400;;
+    margin-left: 8px;
+    display: inline-block;
+  }
+  
+  .selectNodeMessage {
+    text-align: center;
+    display: flex;
+    height: 90vh;
+    color: #777;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .hidden {
+    display: none
+  }
+  </style>
+
+<div class="editor hidden">
+<textarea  id="textarea"></textarea>
+<div class="toolbar" >
+  <a class="selection" onclick="parent.postMessage({ pluginMessage: { type: 'unlockandgo' } }, '*')">Select</a>
+  <a onclick="parent.postMessage({ pluginMessage: { type: 'unlock' } }, '*')">Close</a>
+</div>
+</div>
+<div class="selectNodeMessage">Select a text frame to start editing.</div>
+
+<script>
+
+textarea.onkeyup = () => {
+  parent.postMessage({ pluginMessage: { type: 'change', data: textarea.value } }, '*')
+}
+onmessage = (event) => {
+  if (event.data.pluginMessage.type == 'change') { 
+    textarea.value = event.data.pluginMessage.data
+  }
+  if (event.data.pluginMessage.type == 'locked') { 
+    document.querySelector(".selectNodeMessage").classList.add("hidden")
+    document.querySelector(".editor").classList.remove("hidden")
+  }
+  if (event.data.pluginMessage.type == 'unlocked') { 
+    document.querySelector(".editor").classList.add("hidden")
+    document.querySelector(".selectNodeMessage").classList.remove("hidden")
+  }
+  if (event.data.pluginMessage.type == 'hasSelection') { 
+    document.querySelector(".selection").style.visibility = event.data.pluginMessage.message ? "visible" : "hidden"
+  }
+}
+</script>
