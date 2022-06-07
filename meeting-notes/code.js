@@ -1,6 +1,21 @@
 figma.showUI(__html__, { width: 360, height: 490 });
+/**
+ * TODO: figma.viewport.scrollAndZoomIntoView
+ * https://www.figma.com/plugin-docs/api/properties/nodes-removed/
+ * Show list of available Notes in document to select
+ * Don't show close button? (select is enough?) Show back button?
+ * Ability to create new Note from plugin
+ * Keep reference in newly created notes so you can properly keep track of them
+ * figma.ui.resize(width: number, height: number): void
+ * doucment.. findAll(callback?: (node: (PageNode | SceneNode)) => boolean): ReadonlyArray<PageNode | SceneNode>
+ */
+const KEYWORDS = ['Review', 'review', 'Meeting', 'meeting', 'note', 'Note'];
 var selectedElement = null;
 setSelectedElement();
+sendNotes();
+function sendNotes() {
+    figma.ui.postMessage({ type: 'notes', message: findAllNotes() });
+}
 figma.ui.onmessage = msg => {
     if (msg.type === 'change') {
         applyToTextNode(msg.data, selectedElement);
@@ -15,16 +30,70 @@ figma.ui.onmessage = msg => {
         figma.ui.postMessage({ type: 'unlocked' });
         setSelectedElement();
     }
+    if (msg.type === 'selectNote') {
+        selectedElement = figma.getNodeById(msg.message);
+        figma.ui.postMessage({ type: 'locked' });
+        sendText();
+    }
+    if (msg.type === 'focus') {
+        if (msg.message) {
+            var node = figma.getNodeById(msg.message);
+            figma.currentPage = getPageForNode(node);
+            figma.viewport.scrollAndZoomIntoView([node]);
+        }
+        else {
+            figma.currentPage = getPageForNode(selectedElement);
+            figma.viewport.scrollAndZoomIntoView([selectedElement]);
+        }
+    }
 };
+function getPageForNode(node) {
+    var cursor = node;
+    while (cursor.parent) {
+        cursor = cursor.parent;
+        if (cursor.type == "PAGE") {
+            break;
+        }
+    }
+    return cursor;
+}
 figma.on("selectionchange", () => {
     setSelectedElement();
     sendText();
+    updateSelectionStatus();
+    sendNotes();
+});
+function findAllNotes() {
+    let notes = figma.root.findAll(node => {
+        let chars = node['characters'];
+        if (!chars) {
+            return false;
+        }
+        var lines = chars.split('\n');
+        if (lines.length < 2) {
+            return false;
+        }
+        return KEYWORDS.some(keyword => {
+            return lines[0].indexOf(keyword) != -1;
+        });
+    });
+    var rv = notes.map(note => {
+        var page = getPageForNode(note);
+        return {
+            id: note.id,
+            page: page.name,
+            characters: note['characters']
+        };
+    });
+    // console.log(rv)
+    return rv;
+}
+function updateSelectionStatus() {
     figma.ui.postMessage({ type: 'hasSelection', message: figma.currentPage.selection[0] &&
             selectedElement != figma.currentPage.selection[0] &&
             figma.currentPage.selection[0].characters ? figma.currentPage.selection[0].name : false });
-});
+}
 function setSelectedElement() {
-    console.log('setSelectedElement', selectedElement);
     if (selectedElement) {
         return;
     }
@@ -92,8 +161,12 @@ function applyToTextNode(markdown, node) {
 function sendText() {
     try {
         let node = selectedElement;
-        if (!node || !node.characters) {
-            console.log("nothing selected");
+        if (!node) {
+            // console.log("nothing selected")
+            return;
+        }
+        if (!node.characters) {
+            // console.log("not a textNode")
             return;
         }
         let markdown = convertToMarkdown(node);

@@ -9,7 +9,7 @@
     font-size: 13px;
   }
   textarea {
-    padding: 16px 20px;
+    padding: 20px 20px;
     width: 100%;
     height: calc(100vh - 35px) ;
     border: 0;
@@ -19,31 +19,86 @@
     line-height: 170%;
     font-family: "Inter";
     font-weight: 400;
+    /* background-image: url("data:image/svg+xml,%3Csvg width='360' height='35' viewBox='0 0 360 35' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0)'%3E%3Crect width='360' height='35' fill='%23ECECEC'/%3E%3Cpath d='M-0.5 0H362V26.5H26L-0.5 0Z' fill='white'/%3E%3Cpath d='M0 0H27L26.5 26.5L13 13.5L0 0Z' fill='%23EDEDED'/%3E%3Cline x1='0.353553' y1='0.646447' x2='26.3536' y2='26.6464' stroke='black'/%3E%3Cline x1='26.5' y1='-2.18557e-08' x2='26.5' y2='27' stroke='black'/%3E%3Cline x1='27' y1='0.5' y2='0.5' stroke='black'/%3E%3Cline x1='361' y1='26.5' x2='26' y2='26.5' stroke='black'/%3E%3Cline x1='360' y1='29.5' x2='-1' y2='29.5' stroke='black'/%3E%3Cline x1='360' y1='32.5' x2='-1' y2='32.5' stroke='black'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0'%3E%3Crect width='360' height='35' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A"); */
+    background-position: bottom;
+    background-repeat: no-repeat;
   }
   .toolbar {
-    padding: 0 12px;
+    padding: 0;
     text-align: right;
-    width: 93vw;
-    height: 35px;;
-    background-image: url("data:image/svg+xml,%3Csvg width='360' height='35' viewBox='0 0 360 35' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0)'%3E%3Crect width='360' height='35' fill='%23ECECEC'/%3E%3Cpath d='M-0.5 0H362V26.5H26L-0.5 0Z' fill='white'/%3E%3Cpath d='M0 0H27L26.5 26.5L13 13.5L0 0Z' fill='%23EDEDED'/%3E%3Cline x1='0.353553' y1='0.646447' x2='26.3536' y2='26.6464' stroke='black'/%3E%3Cline x1='26.5' y1='-2.18557e-08' x2='26.5' y2='27' stroke='black'/%3E%3Cline x1='27' y1='0.5' y2='0.5' stroke='black'/%3E%3Cline x1='361' y1='26.5' x2='26' y2='26.5' stroke='black'/%3E%3Cline x1='360' y1='29.5' x2='-1' y2='29.5' stroke='black'/%3E%3Cline x1='360' y1='32.5' x2='-1' y2='32.5' stroke='black'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0'%3E%3Crect width='360' height='35' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A");
+    width: 100vw;
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    border-bottom: 1px solid #eee;
+    justify-content: space-between;
   }
   .toolbar a {
-    text-decoration: underline;
-    color: #555;
+    text-decoration: none;
+    color: #000;
     cursor: pointer;
-    font-size: 11px;
-    font-weight: 400;;
-    margin-left: 8px;
+    font-size: 13px;
+    font-weight: 400;
+    padding: 12px;
     display: inline-block;
   }
-  
-  .selectNodeMessage {
-    text-align: center;
+
+  .toolbar a.disabled {
+    color: #ddd;
+    cursor: default;
+    text-decoration: none;
+  }
+
+  #noteslist {
     display: flex;
-    height: 90vh;
+    flex-direction: column;
+    border-bottom: 1px solid #dfdfdf;
+  }
+  #noteslist.hidden {
+    display: none
+  }
+
+  .selectNodeMessage {
+    height: 100vh;
+    display: flex;
+    text-align: center;
     color: #777;
     justify-content: center;
     align-items: center;
+    padding: 0 40px 40px 40px
+  }
+  .page {
+    border-top: 1px solid #dfdfdf;
+    padding: 8px 12px 8px 12px ;
+    color: #888;
+    font-size: 12px;
+    font-weight: 300;
+    background-color: #fafafa;
+    cursor: default
+  }
+  .page:first-child {
+    border-top: 0;
+  }
+  .note {
+    color: #000;
+    border-top: 1px solid #dfdfdf;
+    line-height: 20px;
+    padding: 8px 12px ;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+  }
+  .note .noteSelect {
+    padding: 4px;
+    border-radius: 5px;;
+  }
+  .note .noteSelect:hover {
+    background: #eee;
+  }
+  .note:hover {
+    background: #fafafa
   }
   
   .hidden {
@@ -52,16 +107,24 @@
   </style>
 
 <div class="editor hidden">
-<textarea  id="textarea"></textarea>
-<div class="toolbar" >
-  <a class="selection" onclick="parent.postMessage({ pluginMessage: { type: 'unlockandgo' } }, '*')">Select</a>
-  <a onclick="parent.postMessage({ pluginMessage: { type: 'unlock' } }, '*')">Close</a>
+  <div class="toolbar" >
+    <a onclick="parent.postMessage({ pluginMessage: { type: 'unlock' } }, '*')">&lt;- Notes</a>
+    <div>
+      <a class="focus" onclick="parent.postMessage({ pluginMessage: { type: 'focus' } }, '*')">Show</a>
+      <a class="selection disabled" onclick="this.classList.add('disabled'); parent.postMessage({ pluginMessage: { type: 'unlockandgo' } }, '*')">Select</a>
+    </div>
+  </div>
+  <textarea  id="textarea"></textarea>
 </div>
+<div id="noteslist">
+<div class="selectNodeMessage"><p>Select a text frame to start editing. Text frames that start with review, meeting or note will appear here.</p></div>
+<div id="notes"></div>
 </div>
-<div class="selectNodeMessage">Select a text frame to start editing.</div>
+
+</div>
 
 <script>
-
+var focusIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-crosshair"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>`;
 textarea.onkeyup = () => {
   parent.postMessage({ pluginMessage: { type: 'change', data: textarea.value } }, '*')
 }
@@ -69,16 +132,46 @@ onmessage = (event) => {
   if (event.data.pluginMessage.type == 'change') { 
     textarea.value = event.data.pluginMessage.data
   }
+  if (event.data.pluginMessage.type == 'notes') { 
+    var notes = event.data.pluginMessage.message;
+
+    if (notes.length == 0) {
+      document.querySelector(".selectNodeMessage").classList.remove("hidden")
+    } else {
+      document.querySelector(".selectNodeMessage").classList.add("hidden")
+    }
+    document.querySelector("#notes").innerHTML = notes.map((note, index) => {
+      var rv = [];
+      if (!notes[index-1] || note.page != notes[index-1].page) {
+        rv.push(`<div class="page">${note.page}</div>`)
+      }
+
+      rv.push(`<div class="note" >
+        <div onclick="parent.postMessage({ pluginMessage: { type: 'selectNote', message: '${note.id}' } }, '*')">
+        <span>${note.characters.substr(0, 80)} ...</span>
+        </div>
+        <div class="noteSelect" onclick="parent.postMessage({ pluginMessage: { type: 'focus', message: '${note.id}' } }, '*')">
+        ${focusIcon}
+        </div>
+        </div>`)
+      return rv.join('');
+    }).join('')
+  }
   if (event.data.pluginMessage.type == 'locked') { 
-    document.querySelector(".selectNodeMessage").classList.add("hidden")
+    document.querySelector("#noteslist").classList.add("hidden")
     document.querySelector(".editor").classList.remove("hidden")
   }
   if (event.data.pluginMessage.type == 'unlocked') { 
     document.querySelector(".editor").classList.add("hidden")
-    document.querySelector(".selectNodeMessage").classList.remove("hidden")
+    document.querySelector("#noteslist").classList.remove("hidden")
   }
   if (event.data.pluginMessage.type == 'hasSelection') { 
-    document.querySelector(".selection").style.visibility = event.data.pluginMessage.message ? "visible" : "hidden"
+    document.querySelector(".selection").setAttribute('title', `Select ${event.data.pluginMessage.message}`)
+    if (event.data.pluginMessage.message) {
+      document.querySelector(".selection").classList.remove("disabled")
+    } else {
+      document.querySelector(".selection").classList.add("disabled")
+    }
   }
 }
 </script>
